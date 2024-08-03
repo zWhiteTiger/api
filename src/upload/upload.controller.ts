@@ -1,11 +1,18 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Res, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Response } from 'express';
+import { UsersService } from 'src/users/users.service';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @Controller('upload')
 export class UploadController {
+
+  constructor(private readonly usersServices: UsersService) {
+
+  }
+
   @Post('file')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
@@ -42,22 +49,26 @@ export class UploadController {
   randomString() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   }
-  
 
-  @Post('file')
+
+  @Post('profile')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads', // กำหนดโฟลเดอร์ที่ต้องการจัดเก็บไฟล์
+        destination: './public/img', // กำหนดโฟลเดอร์ที่ต้องการจัดเก็บไฟล์
         filename: (req, file, callback) => {
-          const newFilename = this.randomString();
+          const newFilename = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
           callback(null, newFilename);
         },
       }),
     }),
   )
-  ChangeName(@UploadedFile() file: Express.Multer.File) {
+  @UseGuards(JwtAuthGuard)
+  ChangeName(@UploadedFile() file: Express.Multer.File,
+    @Req() req: { user: { email: string, sub: string } }) {
     // return this.uploadService.handleFileUpload(file);
+    console.log(req)
     return
+    // return this.usersServices.uploadPicture(file.fieldname, req.user.sub)
   }
 }

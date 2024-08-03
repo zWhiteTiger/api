@@ -21,6 +21,9 @@ export class User extends Document {
 
   @Prop()
   gender: string;
+
+  @Prop()
+  picture?: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

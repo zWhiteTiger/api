@@ -18,4 +18,12 @@ export class UsersService {
     const newUser = new this.userModel(user);
     return newUser.save();
   }
+
+  async uploadPicture(picture: string, id: string) {
+    await this.userModel.updateOne({
+      _id: id
+    }, {
+      picture
+    })
+  }
 }

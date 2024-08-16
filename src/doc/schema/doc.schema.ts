@@ -8,11 +8,8 @@ export class Doc {
   @Prop()
   doc_name: string;
 
-  @Prop()
-  doc_id: string;
-
   @Prop({ type: Types.ObjectId, ref: 'User' })  // Corrected reference type
-  user_id: string;
+  user_id: Types.ObjectId;
 
   @Prop({ default: () => new Date() })
   created_at: Date;
@@ -22,6 +19,12 @@ export class Doc {
 
   @Prop({ default: null })
   deleted_at: Date;
+
+  @Prop({default: "unread"})
+  isStatus: string;
+
+  @Prop()
+  docs_path: string;
 }
 
 export const DocSchema = SchemaFactory.createForClass(Doc);

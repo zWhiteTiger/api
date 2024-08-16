@@ -52,23 +52,48 @@ export class UploadController {
 
 
   @Post('profile')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './public/img', // กำหนดโฟลเดอร์ที่ต้องการจัดเก็บไฟล์
+        destination: './assets/profile', // Directory to save the images
         filename: (req, file, callback) => {
-          const newFilename = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const fileExtName = extname(file.originalname);
+          const newFilename = `${uniqueSuffix}${fileExtName}`;
           callback(null, newFilename);
         },
       }),
+      fileFilter: (req, file, callback) => {
+        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Invalid file type. Only PNG, JPG, and JPEG are allowed.'), false);
+        }
+      },
     }),
   )
-  @UseGuards(JwtAuthGuard)
-  ChangeName(@UploadedFile() file: Express.Multer.File,
-    @Req() req: { user: { email: string, sub: string } }) {
-    // return this.uploadService.handleFileUpload(file);
-    console.log(req)
-    return
-    // return this.usersServices.uploadPicture(file.fieldname, req.user.sub)
+  async uploadProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: { user: { email: string, sub: string } },
+    @Res() res: Response,
+  ) {
+    if (!file) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Invalid file type. Only PNG, JPG, and JPEG are allowed.',
+      });
+    }
+
+    const userEmail = req.user.email;
+    const filePath = `/profile/${file.filename}`;
+
+    // Save the image path to the user's profile in the database
+    await this.usersServices.updateUserProfilePicture(userEmail, filePath); // Corrected to 'usersServices'
+
+    return res.status(HttpStatus.OK).json({
+      message: 'Profile picture uploaded successfully!',
+      url: filePath,
+    });
   }
 }

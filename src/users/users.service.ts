@@ -26,4 +26,14 @@ export class UsersService {
       picture
     })
   }
+
+  async updateUserProfilePicture(email: string, picturePath: string): Promise<User> {
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { email },
+      { picture: picturePath, updated_at: new Date() },
+      { new: true },
+    );
+    return updatedUser;
+  }
+
 }

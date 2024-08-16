@@ -3,7 +3,6 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class User extends Document {
-
   @Prop({ unique: true })
   email: string;
 
@@ -22,8 +21,20 @@ export class User extends Document {
   @Prop()
   gender: string;
 
+  @Prop({ default: null })
+  picture?: string; // Path to the profile picture
+
+  @Prop({ default: () => new Date() })
+  created_at: Date;
+
+  @Prop({ default: null })
+  updated_at: Date;
+
+  @Prop({ default: null })
+  deleted_at: Date;
+
   @Prop()
-  picture?: string | null;
+  role: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

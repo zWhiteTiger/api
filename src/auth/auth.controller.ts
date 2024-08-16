@@ -1,4 +1,5 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -35,11 +36,44 @@ export class AuthController {
   async profile(
     @Req() req: { user: { email: string, sub: string } }
   ) {
-    const { email,firstName,lastName } = await this.usersService.findOne(req.user.email)
+    const { email, firstName, lastName, picture } = await this.usersService.findOne(req.user.email)
     return {
       email,
       firstName,
-      lastName
+      lastName,
+      picture
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    try {
+      if (request.cookies.access_token || request.cookies.user_id) {
+        res.clearCookie('access_token', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+        })
+        res.clearCookie('refresh_token', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+        })
+      }
+
+      return {
+        message: 'OK',
+        statusCode: 200,
+      }
+    } catch (error) {
+
+      throw error
+    }
+  }
+
 }

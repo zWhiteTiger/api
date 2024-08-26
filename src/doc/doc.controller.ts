@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { DocService } from './doc.service';
-import { Doc } from './schema/doc.schema';
 import { DocsDto } from './dto/docs.dto';
 
 @Controller('doc')

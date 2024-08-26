@@ -25,6 +25,10 @@ export class Doc {
 
   @Prop()
   docs_path: string;
+
+  @Prop({default: false})
+  public: boolean;
+
 }
 
 export const DocSchema = SchemaFactory.createForClass(Doc);

@@ -20,7 +20,7 @@ export class Doc {
   @Prop({ default: null })
   deleted_at: Date;
 
-  @Prop({default: "unread"})
+  @Prop({default: "draft"})
   isStatus: string;
 
   @Prop()

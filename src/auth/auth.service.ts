@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(email);
@@ -30,6 +30,18 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
     };
+  }
+
+  async refreshToken(email: string, sub: string): Promise<{ access_token: string, refresh_token: string }> {
+    try {
+      const payload = { email, sub }
+      return {
+        access_token: this.jwtService.sign(payload),
+        refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
+      };
+    } catch (error) {
+      throw error
+    }
   }
 
   async register(user: UserDto) {

@@ -32,16 +32,29 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('refresh/token')
+  async reqToken(@Res({ passthrough: true }) res: Response, @Req() req: { user: { email: string, sub: string } }) {
+    const { access_token, refresh_token } = await this.authService.refreshToken(req.user.email, req.user.sub)
+
+    res.cookie('access_token', access_token, { httpOnly: true })
+    res.cookie('refresh_token', refresh_token, { httpOnly: true })
+
+    return 'ok';
+  }
+
+
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(
     @Req() req: { user: { email: string, sub: string } }
   ) {
-    const { email, firstName, lastName, picture } = await this.usersService.findOne(req.user.email)
+    const { email, firstName, lastName, picture, _id } = await this.usersService.findOne(req.user.email)
     return {
       email,
       firstName,
       lastName,
-      picture
+      picture,
+      _id
     }
   }
 

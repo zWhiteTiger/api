@@ -3,7 +3,7 @@ import { DocService } from './doc.service';
 import { DocsDto } from './dto/docs.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, basename } from 'path';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 
@@ -32,14 +32,20 @@ export class DocController {
   }))
   async create(@Body() dto: DocsDto, @UploadedFile() file: Express.Multer.File, @Res() res: Response, @Req() req: { user: { email: string, sub: string } }) {
     console.log(dto, file); // You can remove this after debugging
+    
+    // Extract the filename without the extension
+    const fileExtName = extname(file.originalname);
+    const fileNameWithoutExt = basename(file.originalname, fileExtName);
+    
     const fileUrl = `/pdf/${file.filename}`;
-    await this.docService.create({ ...dto, user_id: req.user.sub }, file.filename);
+    
+    // Save the document with the name without the extension
+    await this.docService.create({ ...dto, doc_name: fileNameWithoutExt, user_id: req.user.sub }, file.filename);
+    
     return res.status(HttpStatus.OK).json({
       message: 'File uploaded successfully!',
       url: fileUrl,
     });
-    // Here you would typically save the document data to the database and handle the file as needed.
-    // Example: return this.docService.create(dto, file);
   }
 
   @Get()
@@ -49,22 +55,8 @@ export class DocController {
 
   @Delete(':docId')
   async deleteOne(@Param('docId') docId: string): Promise<any> {
-    // Log the received docId and its type
     console.log(`DocController.deleteOne received docId:`, docId, `Type:`, typeof docId);
 
     return this.docService.deleteOne(docId);
-
-    // this.docService.deleteOne(docId);
   }
-
-
 }
-
-
-// @Get(':docId')
-// async findOne(@Param('docId') docId: string): Promise<Doc> {
-//   // Log the received docId and its type
-//   console.log(`DocController.findOne received docId:`, docId, `Type:`, typeof docId);
-
-//   return this.docService.findOne(docId);
-// }

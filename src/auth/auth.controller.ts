@@ -35,11 +35,17 @@ export class AuthController {
   @Post('refresh/token')
   async reqToken(@Res({ passthrough: true }) res: Response, @Req() req: { user: { email: string, sub: string } }) {
     const { access_token, refresh_token } = await this.authService.refreshToken(req.user.email, req.user.sub)
-
     res.cookie('access_token', access_token, { httpOnly: true })
     res.cookie('refresh_token', refresh_token, { httpOnly: true })
 
     return 'ok';
+  }
+
+  @Post('token')
+  async getRefToken(@Req() req: Request) {
+    const token = req.cookies['refresh_token'];
+    // Do something with the token
+    return token ? true : false
   }
 
 

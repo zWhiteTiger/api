@@ -27,7 +27,7 @@ export class AuthService {
     }
     const payload = { email: user.email, sub: user._id };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
     };
   }
@@ -36,7 +36,7 @@ export class AuthService {
     try {
       const payload = { email, sub }
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
         refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
       };
     } catch (error) {

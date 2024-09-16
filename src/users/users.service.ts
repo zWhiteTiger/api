@@ -27,6 +27,14 @@ export class UsersService {
     })
   }
 
+  async uploadSignature(signature: string, id: string): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: id },
+      { signature }
+    );
+  }
+
+
   async updateUserProfilePicture(email: string, picturePath: string): Promise<User> {
     const updatedUser = await this.userModel.findOneAndUpdate(
       { email },
@@ -36,4 +44,15 @@ export class UsersService {
     return updatedUser;
   }
 
+  async updateUserSignature(email: string, signatureFilename: string): Promise<User> {
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        signature: signatureFilename, // Save only filename
+        updated_at: new Date()
+      },
+      { new: true },
+    );
+    return updatedUser;
+  }
 }

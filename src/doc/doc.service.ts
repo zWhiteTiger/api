@@ -29,6 +29,14 @@ export class DocService {
 
   }
 
+  async findByPath(docsPath: string): Promise<Doc | null> {
+    return this.docModel.findOne({ docs_path: docsPath }).exec();
+  }
+
+  async findOne(docId: string): Promise<Doc> {
+    return this.docModel.findById(docId).exec();
+  }
+
   async deleteOne(docId: string): Promise<Doc> {
     // Log the docId to verify its type and value
     console.log(`DocService.deleteOne called with docId:`, docId, `Type:`, typeof docId);

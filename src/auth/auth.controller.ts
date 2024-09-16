@@ -6,6 +6,7 @@ import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { JwtAuthGuard } from './auth.guard';
 import { UsersService } from 'src/users/users.service';
+import { DocService } from 'src/doc/doc.service';
 
 @Controller('auth')
 export class AuthController {
@@ -54,13 +55,14 @@ export class AuthController {
   async profile(
     @Req() req: { user: { email: string, sub: string } }
   ) {
-    const { email, firstName, lastName, picture, _id } = await this.usersService.findOne(req.user.email)
+    const { email, firstName, lastName, picture, _id, signature } = await this.usersService.findOne(req.user.email)
     return {
       email,
       firstName,
       lastName,
       picture,
-      _id
+      _id,
+      signature
     }
   }
 

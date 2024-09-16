@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { DocsDto } from './dto/docs.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -32,16 +32,16 @@ export class DocController {
   }))
   async create(@Body() dto: DocsDto, @UploadedFile() file: Express.Multer.File, @Res() res: Response, @Req() req: { user: { email: string, sub: string } }) {
     console.log(dto, file); // You can remove this after debugging
-    
+
     // Extract the filename without the extension
     const fileExtName = extname(file.originalname);
     const fileNameWithoutExt = basename(file.originalname, fileExtName);
-    
+
     const fileUrl = `/pdf/${file.filename}`;
-    
+
     // Save the document with the name without the extension
     await this.docService.create({ ...dto, doc_name: fileNameWithoutExt, user_id: req.user.sub }, file.filename);
-    
+
     return res.status(HttpStatus.OK).json({
       message: 'File uploaded successfully!',
       url: fileUrl,
@@ -51,6 +51,24 @@ export class DocController {
   @Get()
   async findAll() {
     return this.docService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':docsPath')
+  async getDocumentByPath(
+    @Param('docsPath') docsPath: string,
+    @Req() req: { user: { email: string } }
+  ) {
+    const document = await this.docService.findByPath(docsPath);
+    if (!document) {
+      throw new NotFoundException(`Document with path ${docsPath} not found`);
+    }
+    return {
+      docName: document.doc_name,
+      userId: document.user_id,
+      public: document.public,
+      docsPath: document.docs_path
+    };
   }
 
   @Delete(':docId')

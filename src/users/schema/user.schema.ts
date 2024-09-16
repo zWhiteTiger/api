@@ -24,6 +24,10 @@ export class User extends Document {
   @Prop({ default: null })
   picture?: string; // Path to the profile picture
 
+  @Prop({ default: null })
+  signature?: string; // Path to the profile picture
+
+
   @Prop({ default: () => new Date() })
   created_at: Date;
 

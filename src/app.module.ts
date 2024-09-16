@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module'; // Import UploadModule
 import { ServeStaticModule } from '@nestjs/serve-static'; // Import ServeStaticModule
 import { join } from 'path';
+import { ApprovalModule } from './approval/approval.module';
 
 @Module({
   imports: [
@@ -16,16 +17,21 @@ import { join } from 'path';
     MongooseModule.forRoot("mongodb://root:example@localhost:27017/docs?authSource=admin"),
     AuthModule,
     UploadModule,
+    ApprovalModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets', 'pdf'), // Serve files from './assets/pdf/'
       serveRoot: '/pdf', // URL path prefix for accessing static files
     },
-    {
-      rootPath: join(__dirname, '..', 'assets', 'profile'), // Serve files from './assets/pdf/'
-      serveRoot: '/profile', // URL path prefix for accessing static files
-    }),
+      {
+        rootPath: join(__dirname, '..', 'assets', 'profile'), // Serve files from './assets/pdf/'
+        serveRoot: '/profile', // URL path prefix for accessing static files
+      },
+      {
+        rootPath: join(__dirname, '..', 'assets', 'signature'), // Serve files from './assets/pdf/'
+        serveRoot: '/signature', // URL path prefix for accessing static files
+      }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

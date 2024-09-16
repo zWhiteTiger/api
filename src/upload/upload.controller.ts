@@ -96,4 +96,51 @@ export class UploadController {
       url: filePath,
     });
   }
+
+  @Post('signature')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './assets/signature', // Directory to save the signature files
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const fileExtName = extname(file.originalname);
+          const newFilename = `${uniqueSuffix}${fileExtName}`;
+          callback(null, newFilename);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Invalid file type. Only PNG, JPG, and JPEG are allowed.'), false);
+        }
+      },
+    }),
+  )
+  async uploadSignaturePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: { user: { email: string, sub: string } },
+    @Res() res: Response,
+  ) {
+    if (!file) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Invalid file type. Only PNG, JPG, and JPEG are allowed.',
+      });
+    }
+
+    const userEmail = req.user.email;
+    const filename = file.filename; // Only keep filename and extension
+
+    // Save the filename to the user's profile in the database
+    await this.usersServices.updateUserSignature(userEmail, filename);
+
+    return res.status(HttpStatus.OK).json({
+      message: 'Signature picture uploaded successfully!',
+      filename, // Return filename for reference
+    });
+  }
+
 }

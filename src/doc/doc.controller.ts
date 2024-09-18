@@ -67,7 +67,7 @@ export class DocController {
       docName: document.doc_name,
       userId: document.user_id,
       public: document.public,
-      docsPath: document.docs_path
+      docsPath: document.docs_path,
     };
   }
 

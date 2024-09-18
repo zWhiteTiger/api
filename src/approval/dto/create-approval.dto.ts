@@ -1,9 +1,9 @@
 export class CreateApprovalDto {
-    readonly doc_id: string;
-    readonly email: string;
-    readonly firstName?: string;
-    readonly lastName?: string;
-    readonly signature?: string; // Optional initially
-    readonly position?: number[];
-    readonly page?: number
-}
+    doc_id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    signature?: string;
+    position: number[];
+    page: number;
+  }

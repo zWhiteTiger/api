@@ -19,10 +19,10 @@ export class Approval extends Document {
   @Prop({ type: String }) // This can be a URL or base64 string
   signature: string;
 
-  @Prop([Number])  // เพิ่ม position เป็น array ของตัวเลข
+  @Prop([Number])  // Coordinates for the signature
   position: number[];
 
-  @Prop()  // เพิ่ม page
+  @Prop()  // Page number where the approval is made
   page: number;
 
   @Prop({ type: Date, default: null })

@@ -1,3 +1,5 @@
 export class UpdateApprovalDto {
-    readonly signature?: string;
+    signature?: string;
+    position?: number[];
+    page?: number;
   }

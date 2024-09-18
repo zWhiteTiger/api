@@ -48,4 +48,7 @@ export class AuthService {
     const hashedPassword = bcrypt.hashSync(user.password, 8);
     return this.usersService.create({ ...user, password: hashedPassword });
   }
+
+  
+
 }

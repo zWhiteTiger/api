@@ -22,8 +22,8 @@ import { MailModule } from 'src/mailer/mailer.module';
       inject: [ConfigService], // Injecting ConfigService into JwtModule's async setup
     }),
   ],
-  controllers:[AuthController],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy], // Providing AuthService and JwtStrategy
   exports: [AuthService], // Exporting AuthService for use in other modules
 })
-export class AuthModule {}
+export class AuthModule { }

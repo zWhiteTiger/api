@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode, Delete } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode, Delete, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
@@ -8,9 +8,6 @@ import { JwtAuthGuard } from './auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { DocService } from 'src/doc/doc.service';
 import { MailService } from 'src/mailer/mailer.service';
-import { generateOtp } from 'src/mailer/mailer.util';
-import { VerifyOtpDto } from 'src/mailer/dto/verify-otp.dto';
-import { ForgotPasswordDto } from 'src/mailer/dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -102,64 +99,42 @@ export class AuthController {
     }
   }
 
-  @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    const { email } = forgotPasswordDto;
-
-    // Find user by email
-    const user = await this.usersService.findUserByEmail(email); // usersService instead of userService
-
-    // Generate OTP
-    const otp = generateOtp();
-
-    // Send OTP via email
-    await this.mailService.sendOtpEmail(user.email, otp);
-
-    // Save OTP to the database (optional step)
-
-    return { message: 'OTP sent to your email' };
+  @Post('request-otp')
+  async requestOtp(@Body('email') email: string): Promise<{ message: string }> {
+    await this.mailService.sendOtpEmail(email);
+    return { message: 'OTP sent to email.' };
   }
 
   @Post('verify-otp')
-  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
-    const { email, otp } = verifyOtpDto;
+  async verifyOtp(
+    @Body('email') email: string,
+    @Body('otp') otp: string,
+    @Res() res: Response
+  ): Promise<void> {
+    const isOtpValid = await this.mailService.verifyOtp(email, otp);
 
-    // Fetch the stored OTP (implement this logic)
-    const storedOtp = await this.mailService.getOtp(email);
-
-    if (storedOtp === otp) {
-      // OTP is correct, proceed with the password reset process
-      return { message: 'OTP verified successfully' };
+    if (isOtpValid) {
+      // Redirect to SetNewPassword page after successful OTP verification
+      return res.redirect('/auth/set-new-password');
     } else {
-      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid OTP' });
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete('delete')
-  async deleteUser(
-    @Req() req: { user: { email: string, sub: string } },
-    @Res({ passthrough: true }) res: Response
-  ) {
-    try {
-      // Delete the user using their email or ID
-      const result = await this.usersService.delete(req.user.sub);
+  @Get('set-new-password')
+  async getSetNewPasswordPage(@Res() res: Response): Promise<void> {
+    res.render('set-new-password'); // Render the password reset page
+  }
 
-      if (result) {
-        // Clear cookies after successful deletion
-        res.clearCookie('access_token', { httpOnly: true });
-        res.clearCookie('refresh_token', { httpOnly: true });
-
-        return {
-          message: 'User deleted successfully',
-          statusCode: 200,
-        };
-      } else {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
-    } catch (error) {
-      throw new HttpException('Failed to delete user', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  @Post('set-new-password')
+  async setNewPassword(
+    @Body('email') email: string,
+    @Body('newPassword') newPassword: string
+  ): Promise<{ message: string }> {
+    // Handle password reset logic (e.g., update in DB)
+    // Example:
+    // await this.userService.updatePassword(email, newPassword);
+    return { message: 'Password successfully updated' };
   }
 
 }

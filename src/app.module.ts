@@ -7,6 +7,7 @@ import { UploadModule } from './upload/upload.module'; // Import UploadModule
 import { ServeStaticModule } from '@nestjs/serve-static'; // Import ServeStaticModule
 import { join } from 'path';
 import { ApprovalModule } from './approval/approval.module';
+import { MailService } from './mailer/mailer.service';
 
 @Module({
   imports: [

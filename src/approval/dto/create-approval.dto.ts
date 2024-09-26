@@ -1,9 +1,11 @@
 export class CreateApprovalDto {
-    doc_id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    signature?: string;
-    position: number[];
-    page: number;
-  }
+  doc_id: string;
+  position: Position[];
+  page: number;
+  email: string;
+}
+
+type Position = {
+  x: number,
+  y: number
+}

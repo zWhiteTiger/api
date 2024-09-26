@@ -72,16 +72,3 @@ export class DocService {
   }
 
 }
-
-
-// async findOne(docId: string): Promise<Doc> {
-//   // Log the docId to verify its type and value
-//   console.log(`DocService.findOne called with docId:`, docId, `Type:`, typeof docId);
-
-//   // Ensure docId is a string
-//   if (typeof docId !== 'string') {
-//     throw new Error('docId must be a string');
-//   }
-
-//   return this.docModel.findOne({ doc_id: docId }).exec();
-// }

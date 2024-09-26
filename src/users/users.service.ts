@@ -53,11 +53,20 @@ export class UsersService {
     return updatedUser;
   }
 
-  // In users.service.ts
+  async searchUsers(searchTerm: string) {
+    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive search
+    console.log(`Searching for users with term: ${searchTerm}`);
 
-  async delete(userId: string): Promise<boolean> {
-    const result = await this.userModel.deleteOne({ _id: userId }).exec();
-    return result.deletedCount > 0;
+    const results = await this.userModel.find({
+      $or: [
+        { firstName: { $regex: regex } },
+        { lastName: { $regex: regex } },
+        { email: { $regex: regex } },
+      ],
+    }).exec();
+
+    console.log(`Found users: ${results.length}`);
+    return results;
   }
 
 

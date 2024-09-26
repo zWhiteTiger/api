@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode, Delete, BadRequestException, Query } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { DocService } from 'src/doc/doc.service';
 import { MailService } from 'src/mailer/mailer.service';
+import { VerifyOtpDto } from 'src/mailer/dto/verify-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -50,7 +51,6 @@ export class AuthController {
     // Do something with the token
     return token ? true : false
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
@@ -107,17 +107,19 @@ export class AuthController {
 
   @Post('verify-otp')
   async verifyOtp(
-    @Body('email') email: string,
-    @Body('otp') otp: string,
+    @Body() verifyOtpDto: VerifyOtpDto,
     @Res() res: Response
-  ): Promise<void> {
-    const isOtpValid = await this.mailService.verifyOtp(email, otp);
-
-    if (isOtpValid) {
-      // Redirect to SetNewPassword page after successful OTP verification
-      return res.redirect('/auth/set-new-password');
-    } else {
-      res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid OTP' });
+  ): Promise<void> {  // Ensure the return type is void
+    const { email, otp } = verifyOtpDto;
+    try {
+      const isOtpValid = await this.mailService.verifyOtp(email, otp);
+      if (isOtpValid) {
+        res.status(HttpStatus.OK).json({ message: 'OTP verified successfully' });
+      } else {
+        res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid OTP' });
+      }
+    } catch (error) {
+      res.status(error.getStatus()).json({ message: error.message });
     }
   }
 

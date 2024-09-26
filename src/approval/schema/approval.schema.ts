@@ -19,8 +19,8 @@ export class Approval extends Document {
   @Prop({ type: String }) // This can be a URL or base64 string
   signature: string;
 
-  @Prop([Number])  // Coordinates for the signature
-  position: number[];
+  @Prop([{ x: { type: Number }, y: { type: Number } }])  // Coordinates for the signature
+  position: { x: number, y: number }[];
 
   @Prop()  // Page number where the approval is made
   page: number;

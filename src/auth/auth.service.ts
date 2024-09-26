@@ -49,6 +49,4 @@ export class AuthService {
     return this.usersService.create({ ...user, password: hashedPassword });
   }
 
-  
-
 }

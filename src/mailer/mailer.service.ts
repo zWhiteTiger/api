@@ -21,7 +21,8 @@ export class MailService {
             text: `Your OTP code is: ${otp}. It will expire in 5 minutes.`,
         });
 
-        // Store OTP and expiration time (e.g., 5 minutes)
+        console.log(`OTP for ${email}: ${otp}`);  // Debugging line
+
         this.otpStore.set(email, otp);
         this.otpExpiration.set(email, new Date(new Date().getTime() + 5 * 60000)); // 5 minutes expiration
     }
@@ -30,22 +31,21 @@ export class MailService {
         const storedOtp = this.otpStore.get(email);
         const expiration = this.otpExpiration.get(email);
 
+        console.log(`Stored OTP: ${storedOtp}, Provided OTP: ${otp}`);  // Debugging line
+
         if (!storedOtp || !expiration) {
             throw new HttpException('OTP not found or expired', HttpStatus.BAD_REQUEST);
         }
 
-        // Check if OTP is expired
         if (new Date() > expiration) {
             this.clearOtp(email);
             throw new HttpException('OTP expired', HttpStatus.BAD_REQUEST);
         }
 
-        // Verify OTP
         if (storedOtp !== otp) {
             throw new HttpException('Incorrect OTP', HttpStatus.BAD_REQUEST);
         }
 
-        // Clear OTP after successful verification
         this.clearOtp(email);
 
         return true;

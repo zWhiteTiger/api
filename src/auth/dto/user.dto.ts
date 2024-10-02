@@ -1,4 +1,5 @@
 import { IsString, IsEmail, IsDate, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UserDto {
   @IsEmail()
@@ -16,6 +17,7 @@ export class UserDto {
   @IsString()
   lastName: string;
 
+  @Type(() => Date)  // ใช้ class-transformer เพื่อแปลงค่าเป็น Date
   @IsDate()
   birthDate: Date;
 

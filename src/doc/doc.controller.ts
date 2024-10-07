@@ -40,11 +40,12 @@ export class DocController {
     const fileUrl = `/pdf/${file.filename}`;
 
     // Save the document with the name without the extension
-    await this.docService.create({ ...dto, doc_name: fileNameWithoutExt, user_id: req.user.sub }, file.filename);
+    const { _id } = await this.docService.create({ ...dto, doc_name: fileNameWithoutExt, user_id: req.user.sub }, file.filename);
 
     return res.status(HttpStatus.OK).json({
       message: 'File uploaded successfully!',
       url: fileUrl,
+      docID: _id.toString(),
     });
   }
 

@@ -43,6 +43,7 @@ export class UploadController {
     return res.status(HttpStatus.OK).json({
       message: 'File uploaded successfully!',
       url: fileUrl,
+      // id: id,
     });
   }
 

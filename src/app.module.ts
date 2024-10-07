@@ -31,6 +31,9 @@ import { MailService } from './mailer/mailer.service';
         rootPath: join(__dirname, '..', 'assets', 'signature'), // Serve files from './assets/pdf/'
         serveRoot: '/signature', // URL path prefix for accessing static files
       }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+    }),
   ],
   controllers: [],
   providers: [],

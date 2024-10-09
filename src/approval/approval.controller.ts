@@ -29,9 +29,9 @@ export class ApprovalController {
   }
 
   // Get all approvals for a specific document
-  @Get(':doc_id')
-  async getApprovalsByDocId(@Param('doc_id') docId: string) {
-    return this.approvalService.getApprovalsByDocId(docId);
+  @Get(':docs_path')
+  async getApprovalsByDocId(@Param('docs_path') docs_path: string) {
+    return this.approvalService.getApprovalsByDocId(docs_path);
   }
 
   // Get a single approval by its ID

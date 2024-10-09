@@ -3,6 +3,14 @@ import { Document, Types } from 'mongoose';
 
 export type DocDocument = Doc & Document;
 
+export enum StatusType {
+  DRAFT = 'draft',
+  UNREAD = 'unread',
+  READ = 'read',
+  EXPRESS = 'express',
+  REJECT = 'reject',
+}
+
 @Schema()
 export class Doc {
   @Prop()
@@ -20,8 +28,12 @@ export class Doc {
   @Prop({ default: null })
   deleted_at: Date;
 
-  @Prop({ default: "draft" })
-  isStatus: string;
+  @Prop([{
+    userId: { type: Number, required: true },
+    isStatus: { type: Number, required: true },
+    default: { type: String, enum: Object.values(StatusType), default: StatusType.DRAFT } // Correct enum and default handling
+  }])
+  status: { userId: number, isStatus: number, default: StatusType }[];
 
   @Prop()
   docs_path: string;

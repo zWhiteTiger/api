@@ -27,7 +27,6 @@ export class User extends Document {
   @Prop({ default: null })
   signature?: string; // Path to the profile picture
 
-
   @Prop({ default: () => new Date() })
   created_at: Date;
 
@@ -37,8 +36,21 @@ export class User extends Document {
   @Prop({ default: null })
   deleted_at: Date;
 
-  @Prop()
-  role: string;
+  @Prop({
+    enum: [
+      'student',
+      'counselor',
+      'head of student affairs',
+      'vice dean',
+      'dean',
+    ],
+  })
+  role:
+    | 'student'
+    | 'counselor'
+    | 'head of student affairs'
+    | 'vice dean'
+    | 'dean';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

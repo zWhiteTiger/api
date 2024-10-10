@@ -8,7 +8,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) // InjectModel to use User model
     private readonly userModel: Model<User>,
-  ) { }
+  ) {}
 
   async findOne(email: string): Promise<User | undefined> {
     return await this.userModel.findOne({ email }).lean().exec();
@@ -22,29 +22,30 @@ export class UsersService {
     return user;
   }
 
-
   async create(user: any): Promise<User> {
     const newUser = new this.userModel(user);
     return newUser.save();
   }
 
   async uploadPicture(picture: string, id: string) {
-    await this.userModel.updateOne({
-      _id: id
-    }, {
-      picture
-    })
-  }
-
-  async uploadSignature(signature: string, id: string): Promise<void> {
     await this.userModel.updateOne(
-      { _id: id },
-      { signature }
+      {
+        _id: id,
+      },
+      {
+        picture,
+      },
     );
   }
 
+  async uploadSignature(signature: string, id: string): Promise<void> {
+    await this.userModel.updateOne({ _id: id }, { signature });
+  }
 
-  async updateUserProfilePicture(email: string, picturePath: string): Promise<User> {
+  async updateUserProfilePicture(
+    email: string,
+    picturePath: string,
+  ): Promise<User> {
     const updatedUser = await this.userModel.findOneAndUpdate(
       { email },
       { picture: picturePath, updated_at: new Date() },
@@ -57,28 +58,43 @@ export class UsersService {
     const regex = new RegExp(searchTerm, 'i'); // Case-insensitive search
     console.log(`Searching for users with term: ${searchTerm}`);
 
-    const results = await this.userModel.find({
-      $or: [
-        { firstName: { $regex: regex } },
-        { lastName: { $regex: regex } },
-        { email: { $regex: regex } },
-      ],
-    }).exec();
+    const results = await this.userModel
+      .find({
+        $or: [
+          { firstName: { $regex: regex } },
+          { lastName: { $regex: regex } },
+          { email: { $regex: regex } },
+        ],
+      })
+      .exec();
 
     console.log(`Found users: ${results.length}`);
     return results;
   }
 
-
-  async updateUserSignature(email: string, signatureFilename: string): Promise<User> {
+  async updateUserSignature(
+    email: string,
+    signatureFilename: string,
+  ): Promise<User> {
     const updatedUser = await this.userModel.findOneAndUpdate(
       { email },
       {
         signature: signatureFilename, // Save only filename
-        updated_at: new Date()
+        updated_at: new Date(),
       },
       { new: true },
     );
     return updatedUser;
+  }
+
+  async getUsers(): Promise<User[]> {
+    try {
+      const users = await this.userModel
+        .find()
+        .select('email role fristName laseName birthDate');
+      return users;
+    } catch (error) {
+      throw new Error();
+    }
   }
 }

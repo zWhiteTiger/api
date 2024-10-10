@@ -16,6 +16,9 @@ export class Approval extends Document {
   @Prop({ type: String, required: true })
   lastName: string;
 
+  @Prop({ type: String, default: "pending" })
+  isApproved: string;
+
   @Prop({ type: String }) // This can be a URL or base64 string
   signature: string;
 

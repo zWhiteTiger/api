@@ -5,6 +5,7 @@ export class UpdateApprovalDto {
   firstName?: string;  // Update the user's first name
   lastName?: string;   // Update the user's last name
   signature?: string;  // Update the user's signature (URL or base64 string)
+  isApproved?: string;
 }
 
 type Position = {

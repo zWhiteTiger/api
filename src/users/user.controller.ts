@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { UpdatePassword } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,5 +15,10 @@ export class UserController {
   @Get()
   async users() {
     return this.userService.getUsers();
+  }
+
+  @Patch()
+  async updatePassword(@Body() dto: UpdatePassword) {
+    return this.userService.updatePassword(dto.userId, dto.password);
   }
 }

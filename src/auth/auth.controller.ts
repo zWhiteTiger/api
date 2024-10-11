@@ -1,4 +1,18 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Req, Res, UseGuards, Get, HttpCode, Delete, BadRequestException, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Req,
+  Res,
+  UseGuards,
+  Get,
+  HttpCode,
+  Delete,
+  BadRequestException,
+  Query,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
@@ -16,18 +30,18 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   @Post('login')
   // @UseGuards(JwtAuthGuard) permissions for logined users
   async login(
     @Res({ passthrough: true }) res: Response,
-    @Body() dto: LoginDto
+    @Body() dto: LoginDto,
   ) {
-    const { access_token, refresh_token } = await this.authService.login(dto)
-    res.cookie('access_token', access_token, { httpOnly: true })
-    res.cookie('refresh_token', refresh_token, { httpOnly: true })
-    return "ok"
+    const { access_token, refresh_token } = await this.authService.login(dto);
+    res.cookie('access_token', access_token, { httpOnly: true });
+    res.cookie('refresh_token', refresh_token, { httpOnly: true });
+    return 'ok';
   }
 
   @Post('register')
@@ -37,10 +51,17 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('refresh/token')
-  async reqToken(@Res({ passthrough: true }) res: Response, @Req() req: { user: { email: string, sub: string } }) {
-    const { access_token, refresh_token } = await this.authService.refreshToken(req.user.email, req.user.sub)
-    res.cookie('access_token', access_token, { httpOnly: true })
-    res.cookie('refresh_token', refresh_token, { httpOnly: true })
+  async reqToken(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: { user: { email: string; sub: string; role: string } },
+  ) {
+    const { access_token, refresh_token } = await this.authService.refreshToken(
+      req.user.email,
+      req.user.sub,
+      req.user.role,
+    );
+    res.cookie('access_token', access_token, { httpOnly: true });
+    res.cookie('refresh_token', refresh_token, { httpOnly: true });
 
     return 'ok';
   }
@@ -49,23 +70,22 @@ export class AuthController {
   async getRefToken(@Req() req: Request) {
     const token = req.cookies['refresh_token'];
     // Do something with the token
-    return token ? true : false
+    return token ? true : false;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async profile(
-    @Req() req: { user: { email: string, sub: string } }
-  ) {
-    const { email, firstName, lastName, picture, _id, signature } = await this.usersService.findOne(req.user.email)
+  async profile(@Req() req: { user: { email: string; sub: string } }) {
+    const { email, firstName, lastName, picture, _id, signature } =
+      await this.usersService.findOne(req.user.email);
     return {
       email,
       firstName,
       lastName,
       picture,
       _id,
-      signature
-    }
+      signature,
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -81,21 +101,20 @@ export class AuthController {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'strict',
-        })
+        });
         res.clearCookie('refresh_token', {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'strict',
-        })
+        });
       }
 
       return {
         message: 'OK',
         statusCode: 200,
-      }
+      };
     } catch (error) {
-
-      throw error
+      throw error;
     }
   }
 
@@ -108,13 +127,16 @@ export class AuthController {
   @Post('verify-otp')
   async verifyOtp(
     @Body() verifyOtpDto: VerifyOtpDto,
-    @Res() res: Response
-  ): Promise<void> {  // Ensure the return type is void
+    @Res() res: Response,
+  ): Promise<void> {
+    // Ensure the return type is void
     const { email, otp } = verifyOtpDto;
     try {
       const isOtpValid = await this.mailService.verifyOtp(email, otp);
       if (isOtpValid) {
-        res.status(HttpStatus.OK).json({ message: 'OTP verified successfully' });
+        res
+          .status(HttpStatus.OK)
+          .json({ message: 'OTP verified successfully' });
       } else {
         res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid OTP' });
       }
@@ -131,12 +153,11 @@ export class AuthController {
   @Post('set-new-password')
   async setNewPassword(
     @Body('email') email: string,
-    @Body('newPassword') newPassword: string
+    @Body('newPassword') newPassword: string,
   ): Promise<{ message: string }> {
     // Handle password reset logic (e.g., update in DB)
     // Example:
     // await this.userService.updatePassword(email, newPassword);
     return { message: 'Password successfully updated' };
   }
-
 }

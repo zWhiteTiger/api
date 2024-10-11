@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOne(email);
@@ -23,24 +23,31 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto.email, dto.password);
     if (!user) {
-      throw new HttpException('email or password is incorrect', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'email or password is incorrect',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
-    const payload = { email: user.email, sub: user._id };
+    const payload = { email: user.email, sub: user._id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
     };
   }
 
-  async refreshToken(email: string, sub: string): Promise<{ access_token: string, refresh_token: string }> {
+  async refreshToken(
+    email: string,
+    sub: string,
+    role: string,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     try {
-      const payload = { email, sub }
+      const payload = { email, sub, role };
       return {
         access_token: this.jwtService.sign(payload, { expiresIn: '1d' }),
         refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }), // Refresh token valid for 7 days
       };
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -48,5 +55,4 @@ export class AuthService {
     const hashedPassword = bcrypt.hashSync(user.password, 8);
     return this.usersService.create({ ...user, password: hashedPassword });
   }
-
 }

@@ -26,6 +26,7 @@ export class ApprovalService {
       email: dto.email,
       firstName: firstName,
       lastName: lastName,
+      priority: dto.priority,
       signature: signature,
       position: dto.position, // This should be an array of { x, y } objects
       page: dto.page,

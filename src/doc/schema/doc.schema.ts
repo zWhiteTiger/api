@@ -23,6 +23,12 @@ export class Doc {
   @Prop({ default: "draft" })
   isStatus: string;
 
+  @Prop({ default: "pending" })
+  isProgress: string;
+
+  @Prop({ default: 0 })
+  currentPriority: number
+
   @Prop()
   docs_path: string;
 

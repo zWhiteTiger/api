@@ -9,4 +9,12 @@ export class PublicDocsDto {
     @IsOptional()
     status: "unread";
 
+    @IsString()
+    @IsOptional()
+    isProgress: "pending";
+
+    @IsString()
+    @IsOptional()
+    currentPriority: string
+
 }

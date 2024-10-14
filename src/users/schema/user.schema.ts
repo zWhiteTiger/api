@@ -51,6 +51,26 @@ export class User extends Document {
     | 'head of student affairs'
     | 'vice dean'
     | 'dean';
+
+  @Prop({
+    enum: [
+      'CE',
+      'LE',
+      'IEA',
+      'ME',
+      'IDA',
+      'AME',
+    ],
+  })
+  department:
+    | 'CE'
+    | 'LE'
+    | 'IEA'
+    | 'ME'
+    | 'IDA'
+    | 'AME';
 }
+
+
 
 export const UserSchema = SchemaFactory.createForClass(User);

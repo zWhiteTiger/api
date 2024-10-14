@@ -1,4 +1,4 @@
-import { Injectable, RequestTimeoutException } from '@nestjs/common';
+import { Injectable, NotFoundException, RequestTimeoutException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { randomUUID } from 'crypto';
@@ -69,6 +69,14 @@ export class DocService {
     }
 
     return doc;
+  }
+
+  async update(docId: string, updateData: Partial<DocsDto>): Promise<Doc> {
+    const updatedDoc = await this.docModel.findByIdAndUpdate(docId, updateData, { new: true });
+    if (!updatedDoc) {
+      throw new NotFoundException(`Document with ID ${docId} not found`);
+    }
+    return updatedDoc;
   }
 
 }

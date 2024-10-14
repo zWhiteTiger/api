@@ -16,7 +16,7 @@ export class Approval extends Document {
   @Prop({ type: String, required: true })
   lastName: string;
 
-  @Prop({ type: String, default: "pending" })
+  @Prop({ type: String, default: "unApprove" })
   isApproved: string;
 
   @Prop({ type: String }) // This can be a URL or base64 string
@@ -27,6 +27,9 @@ export class Approval extends Document {
 
   @Prop()  // Page number where the approval is made
   page: number;
+
+  @Prop()
+  priority: number
 
   @Prop({ type: Date, default: null })
   delete_at: Date;

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DocService } from './doc.service';
 import { DocsDto } from './dto/docs.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -70,6 +70,7 @@ export class DocController {
       public: document.public,
       docsPath: document.docs_path,
       _id: document._id,
+      currentPriority: document.currentPriority,
     };
   }
 
@@ -78,5 +79,34 @@ export class DocController {
     console.log(`DocController.deleteOne received docId:`, docId, `Type:`, typeof docId);
 
     return this.docService.deleteOne(docId);
+  }
+
+  @Patch(':docId')
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('docId') docId: string,
+    @Body() updateDto: Partial<DocsDto>,
+    @Req() req: { user: { email: string, sub: string } },
+    @Res() res: Response
+  ) {
+    try {
+      const document = await this.docService.findOne(docId);
+      if (!document) {
+        throw new NotFoundException(`Document with ID ${docId} not found`);
+      }
+
+      const updatedDoc = await this.docService.update(docId, {
+        ...updateDto,
+        user_id: req.user.sub, // Update user_id from authenticated user
+      });
+
+      return res.status(HttpStatus.OK).json({
+        message: 'Document updated successfully!',
+        updatedDoc,
+      });
+    } catch (error) {
+      console.error(`Error updating document:`, error);
+      throw new BadRequestException('Error updating document');
+    }
   }
 }

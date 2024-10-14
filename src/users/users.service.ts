@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
 import * as bcrypt from 'bcryptjs';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) // InjectModel to use User model
     private readonly userModel: Model<User>,
-  ) {}
+  ) { }
 
   async findOne(email: string): Promise<User | undefined> {
     return await this.userModel.findOne({ email }).lean().exec();
@@ -92,7 +93,7 @@ export class UsersService {
     try {
       const users = await this.userModel
         .find()
-        .select('email role fristName laseName birthDate');
+        .select('email role firstName lastName birthDate picture department');
 
       return users;
     } catch (error) {
@@ -111,5 +112,19 @@ export class UsersService {
     } catch (error) {
       throw new Error();
     }
+  }
+
+  async updateUserDetails(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      { ...updateUserDto, updated_at: new Date() },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return updatedUser;
   }
 }

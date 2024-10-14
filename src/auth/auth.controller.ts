@@ -30,7 +30,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('login')
   // @UseGuards(JwtAuthGuard) permissions for logined users
@@ -76,7 +76,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(@Req() req: { user: { email: string; sub: string } }) {
-    const { email, firstName, lastName, picture, _id, signature } =
+    const { email, firstName, lastName, picture, _id, signature, role, department } =
       await this.usersService.findOne(req.user.email);
     return {
       email,
@@ -85,6 +85,8 @@ export class AuthController {
       picture,
       _id,
       signature,
+      role,
+      department,
     };
   }
 

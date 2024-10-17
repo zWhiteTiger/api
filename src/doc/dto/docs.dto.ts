@@ -19,6 +19,6 @@ export class DocsDto {
 
     @IsNumber()
     @IsOptional()
-    currentPriority: string
+    currentPriority: number
 
 }

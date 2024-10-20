@@ -40,16 +40,17 @@ export class User extends Document {
     enum: [
       'student',
       'counselor',
-      'head of student affairs',
-      'vice dean',
+      'head_of_student_affairs',
+      'vice_dean',
       'dean',
     ],
+    default: null
   })
   role:
     | 'student'
     | 'counselor'
-    | 'head of student affairs'
-    | 'vice dean'
+    | 'head_of_student_affairs'
+    | 'vice_dean'
     | 'dean';
 
   @Prop({
@@ -61,6 +62,7 @@ export class User extends Document {
       'IDA',
       'AME',
     ],
+    default: null
   })
   department:
     | 'CE'

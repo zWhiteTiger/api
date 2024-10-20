@@ -127,4 +127,8 @@ export class UsersService {
 
     return updatedUser;
   }
+
+  async deleteUser(_id: string): Promise<void> {
+    await this.userModel.findByIdAndDelete(_id);
+  }
 }

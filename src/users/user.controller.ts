@@ -43,5 +43,11 @@ export class UserController {
   async deleteUser(@Param('id') _id: string): Promise<{ message: string }> {
     await this.userService.deleteUser(_id);
     return { message: 'User deleted successfully' };
-  } โ
+  }
+
+  // Fetch a user by user_id or _id
+  @Get(':id')
+  async getUserById(@Param('id') id: string): Promise<User> {
+    return this.userService.findById(id); // Call service method to fetch the user
+  }
 }

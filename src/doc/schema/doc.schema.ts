@@ -11,6 +11,15 @@ export class Doc {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user_id: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  firstName: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  lastName: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  email: Types.ObjectId;
+
   @Prop({ default: () => new Date() })
   created_at: Date;
 

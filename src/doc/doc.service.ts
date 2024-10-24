@@ -30,7 +30,7 @@ export class DocService {
   }
 
   async findByPath(docsPath: string): Promise<Doc | null> {
-    return this.docModel.findOne({ docs_path: docsPath }).exec();
+    return await this.docModel.findOne({ docs_path: docsPath }).populate("user_id").exec();
   }
 
   async findOne(docId: string): Promise<Doc> {

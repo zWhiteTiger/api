@@ -60,18 +60,19 @@ export class DocController {
     @Param('docsPath') docsPath: string,
     @Req() req: { user: { email: string } }
   ) {
-    const document = await this.docService.findByPath(docsPath);
-    if (!document) {
-      throw new NotFoundException(`Document with path ${docsPath} not found`);
-    }
-    return {
-      docName: document.doc_name,
-      userId: document.user_id,
-      public: document.public,
-      docsPath: document.docs_path,
-      _id: document._id,
-      currentPriority: document.currentPriority,
-    };
+    console.log(docsPath)
+    return await this.docService.findByPath(docsPath);
+    // if (!document) {
+    //   throw new NotFoundException(`Document with path ${docsPath} not found`);
+    // }
+    // return {
+    //   docName: document.doc_name,
+    //   userId: document.user_id,
+    //   public: document.public,
+    //   docsPath: document.docs_path,
+    //   _id: document._id,
+    //   currentPriority: document.currentPriority,
+    // };
   }
 
   @Delete(':docId')

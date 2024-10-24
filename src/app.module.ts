@@ -15,7 +15,7 @@ import { MailService } from './mailer/mailer.service';
       isGlobal: true,
     }),
     DocModule,
-    MongooseModule.forRoot("mongodb://root:example@localhost:27017/docs?authSource=admin"),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     UploadModule,
     ApprovalModule,

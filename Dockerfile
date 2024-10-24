@@ -1,23 +1,37 @@
-# Use the official Node.js image as a base
-FROM node:21
+# Stage 1: Build the NestJS app
+FROM node:21 AS build
 
 # Set the working directory inside the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
-# Install the dependencies
-RUN yarn
+# Install dependencies
+RUN npm install
 
-# Copy the rest of your application code
+# Copy the rest of the application code to the container
 COPY . .
 
-# Build the NestJS application
-RUN yarn build
+# Build the application
+RUN npm run build
 
-# Expose the port that the app runs on
-EXPOSE 4444
+# Stage 2: Create a smaller runtime image
+FROM node:21-alpine AS production
 
-# Command to run the application
-CMD ["node", "dist/main.js"]
+# Set the NODE_ENV to production
+ENV NODE_ENV=production
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy only the necessary files from the build stage to the production stage
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+
+# Expose the port the app will run on
+EXPOSE 3000
+
+# Command to run the NestJS app
+CMD ["node", "dist/main"]
